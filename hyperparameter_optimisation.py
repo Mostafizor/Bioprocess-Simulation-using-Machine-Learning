@@ -5,15 +5,15 @@ from Replicate import replicate_data
 from sklearn import preprocessing 
 from sklearn.model_selection import KFold
 
-# Load training data as pd dataframe and convert pd dataframe into numpy array
+# Load training data as pd dataframe and convert pd dataframe into numpy array.
 training_data = pd.read_excel('Data/reduced_training_data.xlsx')
 training_data_array = np.array(training_data)
 
-# Split data into k=6 folds
+# Split data into k=6 folds.
 kf = KFold(n_splits=6)
 kf.get_n_splits(training_data)
 
-# Split training data set into 6 subsets containing k-1 folds before optimisation
+# Split training data set into 6 subsets containing k-1 folds before optimisation.
 class wrapper(object):
     def __init__(self):
         self.value = []
@@ -44,7 +44,7 @@ for train_index, test_index in kf.split(training_data):
     
     index +=1
 
-# Replicate the training and testing data in each subset
+# Replicate the training and testing data in each subset.
 columns = "BC NC LP LI NIC".split()
 for index, subset in enumerate(subset_train_list):
     df = pd.DataFrame(data=subset.value, index=None, columns=columns)
