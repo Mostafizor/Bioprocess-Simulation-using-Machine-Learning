@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np 
-from ANN import Net
+from ann import Net
 from Replicate import replicate_data
 from sklearn import preprocessing 
 from sklearn.model_selection import KFold
