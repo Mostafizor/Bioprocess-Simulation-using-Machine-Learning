@@ -56,9 +56,78 @@ for index, subset in enumerate(subset_train_list):
     replicated_data2 = replicate_data(ref, 50, 0.05)
     df = df.append(replicated_data2, ignore_index=True, sort=False)
 
-    subset.value = df
+    subset.value = np.array(df)
 
-print(subset_train1.value, subset_train2.value, subset_train6.value)
+# Calculate training and test labels
+for index1, subset in enumerate(subset_train_list):
+    a = []
+    
+    try:
+        for index2, row in enumerate(subset.value):
+            dBC = subset_train_list[index1].value[index2 + 1][0] - row[0]
+            dNC = subset_train_list[index1].value[index2 + 1][1] - row[1]
+            dLP = subset_train_list[index1].value[index2 + 1][2] - row[2]
+
+            rates =[dBC, dNC, dLP]
+            a.append(rates)
+    except IndexError:
+        rates = [0, 0, 0]
+        a.append(rates)
+    
+    a = np.array(a)
+    subset_train_list[index1].value = np.append(subset_train_list[index1].value, a, axis=1)
+
+for index1, subset in enumerate(subset_test_list):
+    b = []
+    
+    try:
+        for index2, row in enumerate(subset.value):
+            dBC = subset_test_list[index1].value[index2 + 1][0] - row[0]
+            dNC = subset_test_list[index1].value[index2 + 1][1] - row[1]
+            dLP = subset_test_list[index1].value[index2 + 1][2] - row[2]
+
+            rates =[dBC, dNC, dLP]
+            b.append(rates)
+    except IndexError:
+        rates = [0, 0, 0]
+        b.append(rates)
+    
+    b = np.array(b)
+    subset_test_list[index1].value = np.append(subset_test_list[index1].value, b, axis=1)
+
+print(subset_test2.value)
+
+# for index1, subset in enumerate(subset_train_list):
+#     a = np.array([[]])
+#     try:
+#         for index2, row in enumerate(subset.value):
+#             dBC = subset_train_list[index1].value[index2 + 1][0] - subset_train_list[index1].value[index2][0]
+#             dNC = subset_train_list[index1].value[index2 + 1][1] - subset_train_list[index1].value[index2][1]
+#             dLP = subset_train_list[index1].value[index2 + 1][2] - subset_train_list[index1].value[index2][2]
+
+#             a = np.append(a, [[dBC, dNC, dLP]], axis=1)
+#             print(a)
+#         subset_train_list[index1].value = np.append(subset_train_list[index1].value, a, axis=1)
+#     except IndexError:
+#         (subset_train_list[index1].value)[index2][5:8] = 0
+
+#print(subset_train1.value)
+
+# for index1, subset in enumerate(subset_train_list):
+#     prevRow = []
+#     prevSubset = []
+#     for index2, row in enumerate(subset.value):
+#         if index2 != 0:
+#             dBC = row[0] - prevRow[0]
+#             dNC = row[1] - prevRow[1]
+#             dLP = row[2] - prevRow[2]
+#             subset_train_list[index1][row].append(dBC)
+#             subset_train_list[index1][row].append(dNC)
+#             subset_train_list[index1][row].append(dLP)
+#             prevRow = row
+#         elif index2 == 0:
+#             subset_train_list[index1][index2+1] - subset_train_list[index1][index2]
+
 
 # training_inputs = training_data_array[:, 0:5]
 # training_labels = training_data_array[:, 5:]
@@ -75,7 +144,8 @@ print(subset_train1.value, subset_train2.value, subset_train6.value)
 # convert pd dataframe to numpy array **
 # split data into k folds (k=6) **
 # For each subset of data , replicate the training data (k-1)**
-# Then calculate labels
+# Then calculate labels**
+# Then remove 144 h input points
 # standardise replicated training data
 # Shuffle data
 # standardise the isolated validation set
@@ -84,4 +154,4 @@ print(subset_train1.value, subset_train2.value, subset_train6.value)
 # Calcualte average MSE for each subset and the the average MSE over all subsets.
 # Store average MSE in a dictionary with the key indicating the network config
 # Find the lowest average MSE
-# test this model against testset and plot using matplotlib 
+# test this model against testset and plot using matplotlib
