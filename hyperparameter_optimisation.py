@@ -97,7 +97,6 @@ for index1, subset in enumerate(subset_test_list):
 
 
 # Remove all datapoints corresponding to 144 h from the training and testing sets
-
 for subset in subset_train_list:
     count = 0
     decrement = 0
@@ -109,10 +108,25 @@ for subset in subset_train_list:
             decrement += 1
             count = 0
 
-# df = pd.DataFrame(subset_train1.value)
-# df.to_excel('Data/test2.xlsx')
+for subset in subset_test_list:
+    subset.value = np.delete(subset.value, -1, 0)
+
+subset_train_list = np.array(subset_train_list)
+subset_test_list = np.array(subset_test_list)
+
+# Shuffle Training Data
+for subset in subset_train_list:
+    np.random.shuffle(subset.value)
 
 
+# Standardise Training Data and Test Data
+for subset in subset_train_list:
+    subset.value = preprocessing.scale(subset.value)
+
+for subset in subset_test_list:
+    subset.value = preprocessing.scale(subset.value)    # STD of LI and NIC is zero: what to do?
+
+# Split Training Data into Inputs and labels
 
 
 # training_inputs = training_data_array[:, 0:5]
@@ -131,12 +145,11 @@ for subset in subset_train_list:
 # split data into k folds (k=6) **
 # For each subset of data , replicate the training data (k-1)**
 # Then calculate labels**
-# Then remove 144 h input points
-# The convert subset_train_list and subset_test_list into numpy arrays
-# Shuffle data
+# Then remove 144 h input points**
+# The convert subset_train_list and subset_test_list into numpy arrays**
+# Shuffle data**
+# standardise training data **
 # split training data into inputs and labels
-# standardise training data 
-# standardise the isolated validation set
 # Now that you have subsets, no need to perfrom this preprocessing procedure again; can now validate all hyperparameters
 # Using a for loop, perform k-fold cross validation for each hyperparameter combination : EPOCHS and HN
 # Calcualte average MSE for each subset and the the average MSE over all subsets.
