@@ -93,7 +93,7 @@ for index1, subset in enumerate(subset_test_list):
         b.append(rates)
     
     b = np.array(b)
-    subset.value = np.append(subset.value, b, axis=1) # Do i need to equals sign since the list is an attribute of the object?
+    subset.value = np.append(subset.value, b, axis=1)
 
 # print(type(subset_test1.value))
 
