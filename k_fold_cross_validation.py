@@ -94,7 +94,7 @@ for train_index, test_index in kf.split(training_data):
     
     index +=1
 
-print(len(subset_train1.value))
+# print(len(subset_train1.value))
 # df = pd.DataFrame(training_data)
 # df.to_excel('Data/scaled_and_shuffled_training_data.xlsx')
 
@@ -111,6 +111,7 @@ print(len(subset_train1.value))
 # split training data into inputs and labels
 # Now that you have subsets, no need to perfrom this preprocessing procedure again; can now validate all hyperparameters
 # Using a for loop, perform k-fold cross validation for each hyperparameter combination : EPOCHS and HN
+# ensure the initial values for weigths are the same for each fold
 # Calcualte average MSE for each subset and the the average MSE over all subsets.
 # Store average MSE in a dictionary with the key indicating the network config
 # Find the lowest average MSE
