@@ -95,12 +95,24 @@ for index1, subset in enumerate(subset_test_list):
     b = np.array(b)
     subset.value = np.append(subset.value, b, axis=1)
 
-# print(type(subset_test1.value))
 
 # Remove all datapoints corresponding to 144 h from the training and testing sets
-# count = 2
-# for subset in subset_train_list:
-#     for index
+
+for subset in subset_train_list:
+    count = 0
+    decrement = 0
+    for index, row in enumerate(subset.value):
+        count +=1
+        if count == 13:
+            delete = index - decrement
+            subset.value = np.delete(subset.value, delete, 0)
+            decrement += 1
+            count = 0
+
+# df = pd.DataFrame(subset_train1.value)
+# df.to_excel('Data/test2.xlsx')
+
+
 
 
 # training_inputs = training_data_array[:, 0:5]
