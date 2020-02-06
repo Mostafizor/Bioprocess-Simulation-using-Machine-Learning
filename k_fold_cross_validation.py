@@ -4,6 +4,8 @@ from ann import Net
 from replicate import replicate_data
 from sklearn import preprocessing 
 from sklearn.model_selection import KFold
+from train import train
+from test import test
 
 # Load training data as pd dataframe and convert pd dataframe into numpy array.
 training_data = pd.read_excel('Data/reduced_training_data.xlsx')
@@ -93,6 +95,38 @@ for train_index, test_index in kf.split(training_data):
         subset_test_list[index].value.append(training_data[row])
     
     index +=1
+
+# k-fold cross validation training loop
+HL = 2
+HN = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
+BATCH_SIZE = 50
+LR = 0.001
+MODELS = {}
+
+for h in HN:
+    for e in EPOCHS:
+        MSEs = []
+        for index, subset in enumerate(subset_train_list):
+            subset.value = np.array(subset.value)
+            subset_test_list[index].value = np.array(subset_test_list[index].value)
+
+            net = Net(h)
+            training_inputs = subset.value[:, 0:5]
+            training_labels = subset.value[:, 5:]
+            test_inputs = subset_test_list[index].value[:, 0:5]
+            test_labels = subset_test_list[index].value[:, 5:]
+            
+            train(net, training_inputs, training_labels, e, LR, BATCH_SIZE)
+            avg_mse = test(test_inputs, test_labels, net)
+            MSEs.append(avg_mse)
+
+        avg_mse = sum(MSEs)/len(MSEs)
+        MODELS['{x}_{y}.'.format(x=h, y=e)] = avg_mse
+
+print(MODELS)
+
+
 
 # print(len(subset_train1.value))
 # df = pd.DataFrame(training_data)
