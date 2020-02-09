@@ -152,7 +152,7 @@ for h1, h2 in HN:
         avg_mse = sum(MSEs)/len(MSEs)
         MODELS['{x}_{y}_{z}'.format(x=h1, y=h2, z=e)] = avg_mse
 
-with open('k_fold_results.csv', 'w') as f:
+with open('k_fold_results_hn-e.csv', 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

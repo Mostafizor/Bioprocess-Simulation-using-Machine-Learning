@@ -4,7 +4,7 @@ from ann import Net
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
-from test2 import test
+from test import test
 
 # Load training and testing data as pd dataframe
 training_data = pd.read_excel('Data/reduced_training_data.xlsx')
@@ -90,32 +90,29 @@ for index, row in enumerate(testing_data):
 # Shuffle training data
 np.random.shuffle(training_data)
 
-# Define structure of optimal network
+# Manual Search Training Loop
 HL = 2
-HN1, HN2 = 5, 3
-EPOCHS = 300
+HN = [(5, 3), (10, 6), (15, 9), (20, 12)]
+EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
 BATCH_SIZE = 50
 LR = 0.001
+MODELS = {}
 
-# Instantiate the network and prepare data
-net = Net(HN1, HN2)
-training_inputs = training_data[:, 0:5]
-training_labels = training_data[:, 5:]
-test_inputs = testing_data[:, 0:5]
-test_labels = testing_data[:, 5:]
+for h1, h2 in HN:
+    for e in EPOCHS:
+            net = Net(h1, h2)
+            training_inputs = training_data[:, 0:5]
+            training_labels = training_data[:, 5:]
+            test_inputs = testing_data[:, 0:5]
+            test_labels = testing_data[:, 5:]
+            
+            train(net, training_inputs, training_labels, e, LR, BATCH_SIZE)
+            avg_mse = test(test_inputs, test_labels, net)
 
-# Train and test the network
-train(net, training_inputs, training_labels, EPOCHS, LR, BATCH_SIZE)
-avg_mse, predictions_online, predictions_offline = test(test_inputs, test_labels, net)
+            MODELS['{x}_{y}_{z}'.format(x=h1, y=h2, z=e)] = avg_mse
 
-predictions_online_inverse_transform = scaler_test.inverse_transform(predictions_online)
-predictions_offline_inverse_transform = scaler_test.inverse_transform(predictions_offline)
+with open('manual_search_results_hn-e.csv', 'w') as f:
+    for key in MODELS.keys():
+        f.write("%s: %s\n"%(key, MODELS[key]))
 
-online = pd.DataFrame(predictions_online_inverse_transform)
-offline = pd.DataFrame(predictions_offline_inverse_transform)
-avg_mse = pd.DataFrame([avg_mse, 0])
-
-online.to_excel('Data/Optimised_Networks/optimal_network_k_fold_online {x}_{y}-{z}_{a}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS))
-offline.to_excel('Data/Optimised_Networks/optimal_network_k_fold_offline {x}_{y}-{z}_{a}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS))
-avg_mse.to_excel('Data/Optimised_Networks/optimal_network_k_fold_avg_mse {x}_{y}-{z}_{a}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS))
-
+print(MODELS)
