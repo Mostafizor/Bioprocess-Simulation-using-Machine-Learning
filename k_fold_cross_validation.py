@@ -6,58 +6,20 @@ from sklearn import preprocessing
 from sklearn.model_selection import KFold
 from train import train
 from test import test
+import csv
 
 # Load training data as pd dataframe and convert pd dataframe into numpy array.
 training_data = pd.read_excel('Data/reduced_training_data.xlsx')
+training_data_array = np.array(training_data)
 
-# Replicate the training data
-replicated_data1 = replicate_data(training_data, 50, 0.03)
-replicated_data2 = replicate_data(training_data, 50, 0.03)
+# Standardise Training Data
+training_data_array = preprocessing.scale(training_data_array)
 
-training_data = training_data.append(replicated_data1, ignore_index=True, sort=False)
-training_data = training_data.append(replicated_data2, ignore_index=True, sort=False)
-
-training_data = np.array(training_data)
-
-# Calculate Training Labels
-try:
-    a = []
-    for index, row in enumerate(training_data):
-        dBC = training_data[index + 1][0] - row[0]
-        dNC = training_data[index + 1][1] - row[1]
-        dLP = training_data[index + 1][2] - row[2]
-        
-        rates = [dBC, dNC, dLP]
-        a.append(rates)
-except IndexError:
-    rates = [0, 0, 0]
-    a.append(rates)
-
-a = np.array(a)
-training_data = np.append(training_data, a, axis=1)
-
-# Remove all datapoints corresponding to 144 h from the training and testing sets
-count = 0
-decrement = 0
-for index, row in enumerate(training_data):
-    count += 1
-    if count == 13:
-        delete = index - decrement
-        training_data = np.delete(training_data, delete, 0)
-        decrement += 1
-        count = 0
-
-# Shuffle Training Data
-np.random.shuffle(training_data)
-
-# Standardise the Training Data
-training_data = preprocessing.scale(training_data)  ## Could be an issue with scaling rates of change
-
-# Split the data into k=10 folds
-kf = KFold(n_splits=10)
+# Split data into k=6 folds.
+kf = KFold(n_splits=6)
 kf.get_n_splits(training_data)
 
-# Split training data set into 10 subsets containing k-1 folds before optimisation.
+# Split training data set into 6 subsets containing k-1 folds before optimisation.
 class wrapper(object):
     def __init__(self):
         self.value = []
@@ -68,50 +30,116 @@ subset_train3 = wrapper()
 subset_train4 = wrapper()
 subset_train5 = wrapper()
 subset_train6 = wrapper()
-subset_train7 = wrapper()
-subset_train8 = wrapper()
-subset_train9 = wrapper()
-subset_train10 = wrapper()
 subset_test1 = wrapper() 
 subset_test2 = wrapper()
 subset_test3 = wrapper()
 subset_test4 = wrapper()
 subset_test5 = wrapper()
 subset_test6 = wrapper()
-subset_test7 = wrapper()
-subset_test8 = wrapper()
-subset_test9 = wrapper()
-subset_test10 = wrapper()
-subset_train_list = [subset_train1, subset_train2, subset_train3, subset_train4, subset_train5, subset_train6, subset_train7, subset_train8, subset_train9, subset_train10]
-subset_test_list = [subset_test1, subset_test2, subset_test3, subset_test4, subset_test5, subset_test6, subset_test7, subset_test8, subset_test9, subset_test10]
+subset_train_list = [subset_train1, subset_train2, subset_train3, subset_train4, subset_train5, subset_train6]
+subset_test_list = [subset_test1, subset_test2, subset_test3, subset_test4, subset_test5, subset_test6]
 
 index = 0
 for train_index, test_index in kf.split(training_data):
 
     for row in train_index:
-        subset_train_list[index].value.append(training_data[row])
+        subset_train_list[index].value.append(training_data_array[row])
     
     for row in test_index:
-        subset_test_list[index].value.append(training_data[row])
+        subset_test_list[index].value.append(training_data_array[row])
     
     index +=1
 
+# Replicate the training data in each subset.
+columns = "BC NC LP LI NIC".split()
+for index, subset in enumerate(subset_train_list):
+    df = pd.DataFrame(data=subset.value, index=None, columns=columns)
+    ref = df
+
+    replicated_data1 = replicate_data(ref, 50, 0.03)
+    df = df.append(replicated_data1, ignore_index=True, sort=False)
+
+    replicated_data2 = replicate_data(ref, 50, 0.05)
+    df = df.append(replicated_data2, ignore_index=True, sort=False)
+
+    subset.value = np.array(df)
+
+# Calculate training and test labels
+for index1, subset in enumerate(subset_train_list):
+    a = []
+    
+    try:
+        for index2, row in enumerate(subset.value):
+            dBC = subset.value[index2 + 1][0] - row[0]
+            dNC = subset.value[index2 + 1][1] - row[1]
+            dLP = subset.value[index2 + 1][2] - row[2]
+
+            rates =[dBC, dNC, dLP]
+            a.append(rates)
+    except IndexError:
+        rates = [0, 0, 0]
+        a.append(rates)
+    
+    a = np.array(a)
+    subset.value = np.append(subset.value, a, axis=1) 
+
+for index1, subset in enumerate(subset_test_list):
+    b = []
+    
+    try:
+        for index2, row in enumerate(subset.value):
+            dBC = subset.value[index2 + 1][0] - row[0] 
+            dNC = subset.value[index2 + 1][1] - row[1]
+            dLP = subset.value[index2 + 1][2] - row[2]
+
+            rates =[dBC, dNC, dLP]
+            b.append(rates)
+    except IndexError:
+        rates = [0, 0, 0]
+        b.append(rates)
+    
+    b = np.array(b)
+    subset.value = np.append(subset.value, b, axis=1)
+
+
+# Remove all datapoints corresponding to 144 h from the training and testing sets
+for subset in subset_train_list:
+    count = 0
+    decrement = 0
+    for index, row in enumerate(subset.value):
+        count +=1
+        if count == 13:
+            delete = index - decrement
+            subset.value = np.delete(subset.value, delete, 0)
+            decrement += 1
+            count = 0
+
+for subset in subset_test_list:
+    subset.value = np.delete(subset.value, -1, 0)
+
+subset_train_list = np.array(subset_train_list)
+subset_test_list = np.array(subset_test_list)
+
+# Shuffle Training Data
+for subset in subset_train_list:
+    np.random.shuffle(subset.value)
+
 # k-fold cross validation training loop
 HL = 2
-HN = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+HN = [(5, 3), (10, 6), (15, 9), (20, 12)]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
 BATCH_SIZE = 50
 LR = 0.001
 MODELS = {}
 
-for h in HN:
+for h1, h2 in HN:
     for e in EPOCHS:
         MSEs = []
         for index, subset in enumerate(subset_train_list):
             subset.value = np.array(subset.value)
             subset_test_list[index].value = np.array(subset_test_list[index].value)
 
-            net = Net(h)
+            net = Net(h1, h2)
             training_inputs = subset.value[:, 0:5]
             training_labels = subset.value[:, 5:]
             test_inputs = subset_test_list[index].value[:, 0:5]
@@ -122,31 +150,45 @@ for h in HN:
             MSEs.append(avg_mse)
 
         avg_mse = sum(MSEs)/len(MSEs)
-        MODELS['{x}_{y}.'.format(x=h, y=e)] = avg_mse
+        MODELS['{x}_{y}_{z}'.format(x=h1, y=h2, z=e)] = avg_mse
+
+with open('k_fold_results.csv', 'w') as f:
+    for key in MODELS.keys():
+        f.write("%s: %s\n"%(key, MODELS[key]))
 
 print(MODELS)
 
+# Should the test set be standardised as part of the training data?
+# Or should all of the test data in the folds be standardised together - excluding the train data?
+# Or can I standardise before splitting into folds and replication?
+# Ask Gabe what he did for manual search standardisation
+# Right now i will standardise at the outset
+# In manual search i standardised after replication
+# worst case: test both
+# If i standardise at the outset, I have to add the rates of change to the standardised inputs and subsequently unstandaridse the output. 
+
+# Split Training Data into Inputs and labels
 
 
-# print(len(subset_train1.value))
-# df = pd.DataFrame(training_data)
-# df.to_excel('Data/scaled_and_shuffled_training_data.xlsx')
+# training_inputs = training_data_array[:, 0:5]
+# training_labels = training_data_array[:, 5:]
+# print(training_inputs)
+# print(training_labels)
 
+# standardised_inputs = preprocessing.scale(training_inputs)
+# standardised_labels = preprocessing.scale(training_labels)
 
-# Load traindata **
-# Convert pd dataframe to numpy array **
-# Replicate the Data  **
-# Convert replicated data into numpy array **
-# Calcualte Labels **
-# pop 144 h **
-# Shuffle it **
-# Standardise the data **
-# Split the data in k=10 folds **
-# split training data into inputs and labels
-# Now that you have subsets, no need to perfrom this preprocessing procedure again; can now validate all hyperparameters
-# Using a for loop, perform k-fold cross validation for each hyperparameter combination : EPOCHS and HN
-# ensure the initial values for weigths are the same for each fold
-# Calcualte average MSE for each subset and the the average MSE over all subsets.
-# Store average MSE in a dictionary with the key indicating the network config
-# Find the lowest average MSE
-# test this model against testset and plot using matplotlib
+# print(standardised_inputs)
+# print(standardised_labels)
+
+# load traindata - decide on traindata based on advice from articles **
+# convert pd dataframe to numpy array **
+# Standardise Training Data **
+# split data into k folds (k=6) **
+# For each subset of data , replicate the training data (k-1)**
+# Then calculate labels**
+# Then remove 144 h input points**
+# The convert subset_train_list and subset_test_list into numpy arrays**
+# Shuffle data**
+# standardise training data
+# Implement training loop (5-3 neurons)
