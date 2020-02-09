@@ -91,7 +91,7 @@ for index, row in enumerate(testing_data):
 np.random.shuffle(training_data)
 
 # Manual Search Training Loop
-HL = 2
+HL = 3
 HN = [(5, 3), (10, 6), (15, 9), (20, 12)]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
 BATCH_SIZE = 50
@@ -111,7 +111,7 @@ for h1, h2 in HN:
 
             MODELS['{a}_{x}-{y}_{z}'.format(a=HL, x=h1, y=h2, z=e)] = avg_mse
 
-with open('Data/Search/manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
+with open('manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
