@@ -6,6 +6,7 @@ from sklearn import preprocessing
 from sklearn.model_selection import KFold
 from train import train
 from test import test
+import csv
 
 # Load training data as pd dataframe and convert pd dataframe into numpy array.
 training_data = pd.read_excel('Data/reduced_training_data.xlsx')
@@ -125,11 +126,37 @@ for subset in subset_train_list:
 
 # k-fold cross validation training loop
 HL = 2
-HN = [[5, 10, 15, 20], [3, 6, 9, 12]]
-EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
+HN = [(5, 3)]
+EPOCHS = [15, 30]
 BATCH_SIZE = 50
 LR = 0.001
 MODELS = {}
+
+for h1, h2 in HN:
+    for e in EPOCHS:
+        MSEs = []
+        for index, subset in enumerate(subset_train_list):
+            subset.value = np.array(subset.value)
+            subset_test_list[index].value = np.array(subset_test_list[index].value)
+
+            net = Net(h1, h2)
+            training_inputs = subset.value[:, 0:5]
+            training_labels = subset.value[:, 5:]
+            test_inputs = subset_test_list[index].value[:, 0:5]
+            test_labels = subset_test_list[index].value[:, 5:]
+            
+            train(net, training_inputs, training_labels, e, LR, BATCH_SIZE)
+            avg_mse = test(test_inputs, test_labels, net)
+            MSEs.append(avg_mse)
+
+        avg_mse = sum(MSEs)/len(MSEs)
+        MODELS['{x}_{y}_{z}'.format(x=h1, y=h2, z=e)] = avg_mse
+
+with open('k_fold_results.csv', 'w') as f:
+    for key in MODELS.keys():
+        f.write("%s,%s\n"%(key, MODELS[key]))
+
+print(MODELS)
 
 # Should the test set be standardised as part of the training data?
 # Or should all of the test data in the folds be standardised together - excluding the train data?
