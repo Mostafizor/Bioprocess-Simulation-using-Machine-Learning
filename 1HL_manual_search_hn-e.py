@@ -1,11 +1,10 @@
-import torch
 import pandas as pd
 import numpy as np 
 from ann1 import Net
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
-from test2 import test
+from test import test
 
 # Load training and testing data as pd dataframe
 training_data = pd.read_excel('Data/reduced_training_data.xlsx')
@@ -91,35 +90,29 @@ for index, row in enumerate(testing_data):
 # Shuffle training data
 np.random.shuffle(training_data)
 
-# Define structure of optimal network
+# Manual Search Training Loop
 HL = 1
-HN1 = 10
-EPOCHS = 50
-BATCH_SIZE = 15
-LR = 0.0008
+HN = [5, 10, 15, 20]
+EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
+BATCH_SIZE = 50
+LR = 0.001
+MODELS = {}
 
-# Instantiate the network and prepare data
-avg_mse=1
-while avg_mse > 0.007:
-    net = Net(HN1)
-    training_inputs = training_data[:, 0:5]
-    training_labels = training_data[:, 5:]
-    test_inputs = testing_data[:, 0:5]
-    test_labels = testing_data[:, 5:]
+for h in HN:
+    for e in EPOCHS:
+            net = Net(h)
+            training_inputs = training_data[:, 0:5]
+            training_labels = training_data[:, 5:]
+            test_inputs = testing_data[:, 0:5]
+            test_labels = testing_data[:, 5:]
+            
+            train(net, training_inputs, training_labels, e, LR, BATCH_SIZE)
+            avg_mse = test(test_inputs, test_labels, net)
 
-    # Train and test the network
-    train(net, training_inputs, training_labels, EPOCHS, LR, BATCH_SIZE)
-    avg_mse, predictions_online, predictions_offline = test(test_inputs, test_labels, net)
+            MODELS['{a}_{x}_{z}'.format(a=HL, x=h, z=e)] = avg_mse
 
-predictions_online_inverse_transform = scaler_test.inverse_transform(predictions_online)
-predictions_offline_inverse_transform = scaler_test.inverse_transform(predictions_offline)
+with open('Data/Search/manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
+    for key in MODELS.keys():
+        f.write("%s: %s\n"%(key, MODELS[key]))
 
-online = pd.DataFrame(predictions_online_inverse_transform)
-offline = pd.DataFrame(predictions_offline_inverse_transform)
-avg_mse = pd.DataFrame([avg_mse, 0])
-
-online.to_excel('Data/Optimised_Networks/manual_search_online {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data/Optimised_Networks/manual_search_offline {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data/Optimised_Networks/manual_search_avg_mse {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
-
-torch.save(net.state_dict(), 'Data/Optimised_Networks/Models/optimal_network_manual_search {x}_{y}_{a}_{b}_{c}'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+print(MODELS)

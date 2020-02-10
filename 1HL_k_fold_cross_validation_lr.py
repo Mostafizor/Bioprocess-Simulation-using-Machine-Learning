@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np 
-from ann import Net
+from ann1 import Net
 from replicate import replicate_data
 from sklearn import preprocessing 
 from sklearn.model_selection import KFold
@@ -125,34 +125,33 @@ for subset in subset_train_list:
     np.random.shuffle(subset.value)
 
 # k-fold cross validation training loop
-HL = 2
-HN = [(5, 3), (10, 6), (15, 9), (20, 12)]
-EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
+HL = 1
+HN1 = 10
+EPOCHS = 50
 BATCH_SIZE = 50
-LR = 0.001
+LR = [0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 MODELS = {}
 
-for h1, h2 in HN:
-    for e in EPOCHS:
-        MSEs = []
-        for index, subset in enumerate(subset_train_list):
-            subset.value = np.array(subset.value)
-            subset_test_list[index].value = np.array(subset_test_list[index].value)
+for lr in LR:
+    MSEs = []
+    for index, subset in enumerate(subset_train_list):
+        subset.value = np.array(subset.value)
+        subset_test_list[index].value = np.array(subset_test_list[index].value)
 
-            net = Net(h1, h2)
-            training_inputs = subset.value[:, 0:5]
-            training_labels = subset.value[:, 5:]
-            test_inputs = subset_test_list[index].value[:, 0:5]
-            test_labels = subset_test_list[index].value[:, 5:]
-            
-            train(net, training_inputs, training_labels, e, LR, BATCH_SIZE)
-            avg_mse = test(test_inputs, test_labels, net)
-            MSEs.append(avg_mse)
+        net = Net(HN1)
+        training_inputs = subset.value[:, 0:5]
+        training_labels = subset.value[:, 5:]
+        test_inputs = subset_test_list[index].value[:, 0:5]
+        test_labels = subset_test_list[index].value[:, 5:]
+        
+        train(net, training_inputs, training_labels, EPOCHS, lr, BATCH_SIZE)
+        avg_mse = test(test_inputs, test_labels, net)
+        MSEs.append(avg_mse)
 
-        avg_mse = sum(MSEs)/len(MSEs)
-        MODELS['{a}_{x}-{y}_{z}'.format(a=HL, x=h1, y=h2, z=e)] = avg_mse
+    avg_mse = sum(MSEs)/len(MSEs)
+    MODELS['{a}_{x}_{z}_{b}'.format(a=HL, x=HN1, z=EPOCHS, b=lr)] = avg_mse
 
-with open('Data/Search/k_fold_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
+with open('Data/Search/k_fold_results_{x}HL_lr.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
