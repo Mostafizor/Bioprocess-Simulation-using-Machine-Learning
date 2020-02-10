@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np 
-from ann import Net
+from ann3 import Net
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
@@ -92,15 +92,15 @@ np.random.shuffle(training_data)
 
 # Manual Search Training Loop
 HL = 3
-HN = [(5, 3), (10, 6), (15, 9), (20, 12)]
+HN = [(5, 5, 3), (10, 10, 6), (15, 15, 9), (20, 20, 12)]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
 BATCH_SIZE = 50
 LR = 0.001
 MODELS = {}
 
-for h1, h2 in HN:
+for h1, h2, h3 in HN:
     for e in EPOCHS:
-            net = Net(h1, h2)
+            net = Net(h1, h2, h3)
             training_inputs = training_data[:, 0:5]
             training_labels = training_data[:, 5:]
             test_inputs = testing_data[:, 0:5]
@@ -109,9 +109,9 @@ for h1, h2 in HN:
             train(net, training_inputs, training_labels, e, LR, BATCH_SIZE)
             avg_mse = test(test_inputs, test_labels, net)
 
-            MODELS['{a}_{x}-{y}_{z}'.format(a=HL, x=h1, y=h2, z=e)] = avg_mse
+            MODELS['{a}_{x}-{y}-{c}_{z}'.format(a=HL, x=h1, y=h2, c=h3, z=e)] = avg_mse
 
-with open('manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
+with open('Data/Search/manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

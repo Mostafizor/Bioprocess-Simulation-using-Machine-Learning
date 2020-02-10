@@ -1,14 +1,14 @@
 import torch
 import pandas as pd
 import numpy as np 
-from ann2 import Net
+from ann3 import Net
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
 from test2 import test
 
 # Load training and testing data as pd dataframe
-training_data = pd.read_excel('Data/training_data.xlsx')
+training_data = pd.read_excel('Data/reduced_training_data.xlsx')
 testing_data = pd.read_excel('Data/test_data.xlsx')
 
 # Standardise training and testing data
@@ -92,14 +92,14 @@ for index, row in enumerate(testing_data):
 np.random.shuffle(training_data)
 
 # Define structure of optimal network
-HL = 2
-HN1, HN2 = 20, 12
-EPOCHS = 50
-BATCH_SIZE = 40
-LR = 0.0007
+HL = 3
+HN1, HN2, HN3 = 10, 10, 6
+EPOCHS = 100
+BATCH_SIZE = 50
+LR = 0.002
 
 # Instantiate the network and prepare data
-net = Net(HN1, HN2)
+net = Net(HN1, HN2, HN3)
 training_inputs = training_data[:, 0:5]
 training_labels = training_data[:, 5:]
 test_inputs = testing_data[:, 0:5]
@@ -116,8 +116,8 @@ online = pd.DataFrame(predictions_online_inverse_transform)
 offline = pd.DataFrame(predictions_offline_inverse_transform)
 avg_mse = pd.DataFrame([avg_mse, 0])
 
-online.to_excel('Data/Optimised_Networks/manual_search_online {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data/Optimised_Networks/manual_search_offline {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data/Optimised_Networks/manual_search_avg_mse {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+online.to_excel('Data/Optimised_Networks/manual_search_online {x}_{y}-{z}-{b}_{a}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, b=HN3, a=EPOCHS, c=LR))
+offline.to_excel('Data/Optimised_Networks/manual_search_offline {x}_{y}-{z}-{b}_{a}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, b=HN3, a=EPOCHS, c=LR))
+avg_mse.to_excel('Data/Optimised_Networks/manual_search_avg_mse {x}_{y}-{z}-{b}_{a}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, b=HN3, a=EPOCHS, c=LR))
 
-torch.save(net.state_dict(), 'Data/Optimised_Networks/Models/optimal_network_manual_search {x}_{y}-{z}_{a}_{b}_{c}'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+# torch.save(net.state_dict(), 'Data/Optimised_Networks/Models/optimal_network_manual_search {x}_{y}-{z}_{a}_{b}_{c}'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
