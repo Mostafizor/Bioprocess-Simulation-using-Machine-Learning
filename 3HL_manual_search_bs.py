@@ -96,23 +96,23 @@ HN1 = 10
 HN2 = 10
 HN3 = 6
 EPOCHS = 200
-BATCH_SIZE = 50
-LR = [0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+BATCH_SIZE = [5, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
+LR = 0.09
 MODELS = {}
 
-for lr in LR:
+for bs in BATCH_SIZE:
     net = Net(HN1, HN2, HN3)
     training_inputs = training_data[:, 0:5]
     training_labels = training_data[:, 5:]
     test_inputs = testing_data[:, 0:5]
     test_labels = testing_data[:, 5:]
     
-    train(net, training_inputs, training_labels, EPOCHS, lr, BATCH_SIZE)
+    train(net, training_inputs, training_labels, EPOCHS, LR, bs)
     avg_mse = test(test_inputs, test_labels, net)
 
-    MODELS['{a}_{x}-{y}-{c}_{z}_{b}'.format(a=HL, x=HN1, y=HN2, c=HN3, z=EPOCHS, b=lr)] = avg_mse
+    MODELS['{a}_{x}-{y}-{d}_{z}_{b}_{c}'.format(a=HL, x=HN1, y=HN2, d=HN3, z=EPOCHS, b=LR, c=bs)] = avg_mse
 
-with open('Data/Search/manual_search_results_{x}HL_lr.csv'.format(x=HL), 'w') as f:
+with open('Data/Search/manual_search_results_{x}HL_bs.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
