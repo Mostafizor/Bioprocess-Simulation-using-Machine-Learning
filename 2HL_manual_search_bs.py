@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np 
-from ann import Net
+from ann2 import Net
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
@@ -111,7 +111,7 @@ for bs in BATCH_SIZE:
 
     MODELS['{a}_{x}-{y}_{z}_{b}_{c}'.format(a=HL, x=HN1, y=HN2, z=EPOCHS, b=LR, c=bs)] = avg_mse
 
-with open('Data/Search/manual_search_results_{x}HL_bs.csv'.format(x=HL), 'w') as f:
+with open('Data/Search/manual_search_results_{x}HL_bs2.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
