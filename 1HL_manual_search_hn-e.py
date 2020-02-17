@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np 
+import copy
 from ann1 import Net
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
@@ -17,7 +18,6 @@ scaler_test = StandardScaler()
 scaler_train.fit(training_data)
 scaler_test.fit(testing_data)
 
-training_data = scaler_train.transform(training_data)
 testing_data = scaler_test.transform(testing_data)
 
 # Convert training data to pd dataframe
@@ -31,6 +31,7 @@ replicated_data2 = replicate_data(training_data, 50, 0.05)
 training_data = training_data.append(replicated_data1, ignore_index=True, sort=False)
 training_data = training_data.append(replicated_data2, ignore_index=True, sort=False)
 
+training_data = scaler_train.transform(training_data)
 training_data = np.array(training_data)
 
 # Calculate training and testing labels
@@ -92,14 +93,17 @@ np.random.shuffle(training_data)
 
 # Manual Search Training Loop
 HL = 1
-HN = [5, 10, 15, 20]
+HN = [4, 8, 12, 16, 20]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
 BATCH_SIZE = 50
 LR = 0.001
 MODELS = {}
 
 for h in HN:
+    net = Net(h)
+    init_state = copy.deepcopy(net.state_dict())
     for e in EPOCHS:
+            net.load_state_dict(init_state)
             net = Net(h)
             training_inputs = training_data[:, 0:5]
             training_labels = training_data[:, 5:]
@@ -111,7 +115,7 @@ for h in HN:
 
             MODELS['{a}_{x}_{z}'.format(a=HL, x=h, z=e)] = avg_mse
 
-with open('Data/Search/manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

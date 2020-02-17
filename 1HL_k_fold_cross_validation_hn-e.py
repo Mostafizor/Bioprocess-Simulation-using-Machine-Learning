@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np 
+import copy
 from ann1 import Net
 from replicate import replicate_data
 from sklearn import preprocessing 

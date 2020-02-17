@@ -25,8 +25,8 @@ columns = "BC NC LP LI NIC".split()
 training_data = pd.DataFrame(data=training_data, index=None, columns=columns)
 
 # Replicate the training data
-replicated_data1 = replicate_data(training_data, 10, 0.03)
-replicated_data2 = replicate_data(training_data, 10, 0.05)
+replicated_data1 = replicate_data(training_data, 50, 0.03)
+replicated_data2 = replicate_data(training_data, 50, 0.05)
 
 training_data = training_data.append(replicated_data1, ignore_index=True, sort=False)
 training_data = training_data.append(replicated_data2, ignore_index=True, sort=False)
@@ -93,9 +93,9 @@ np.random.shuffle(training_data)
 
 # Manual Search Training Loop
 HL = 2
-HN = [(5, 3), (10, 6), (15, 9), (20, 12)]
+HN = [(4, 4), (8, 8), (12, 12), (16, 16), (20, 20)]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
-BATCH_SIZE = 10
+BATCH_SIZE = 50
 LR = 0.001
 MODELS = {}
 
@@ -114,7 +114,7 @@ for h1, h2 in HN:
 
             MODELS['{a}_{x}-{y}_{z}'.format(a=HL, x=h1, y=h2, z=e)] = avg_mse
 
-with open('Data2/Search/manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/manual_search_results_{x}HL_hn-e_up_to_20.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

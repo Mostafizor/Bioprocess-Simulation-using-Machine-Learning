@@ -1,7 +1,7 @@
 import torch
 import pandas as pd
 import numpy as np 
-from ann2 import Net
+from ann1 import Net
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
@@ -92,25 +92,25 @@ for index, row in enumerate(testing_data):
 np.random.shuffle(training_data)
 
 # Define structure of optimal network
-HL = 2
-HN1, HN2 = 20, 12
-EPOCHS = 30
-BATCH_SIZE = 100
-LR = 0.002
+HL = 1
+HN1 = 8
+EPOCHS = 50
+BATCH_SIZE = 20
+LR = 0.0007
 
 # Instantiate the network and prepare data
-avg_mse=1
-while avg_mse > 0.00565:
-    net = Net(HN1, HN2)
-    training_inputs = training_data[:, 0:5]
-    training_labels = training_data[:, 5:]
-    test_inputs = testing_data[:, 0:5]
-    test_labels = testing_data[:, 5:]
+#avg_mse=1
+#while avg_mse > 0.006:
+net = Net(HN1)
+training_inputs = training_data[:, 0:5]
+training_labels = training_data[:, 5:]
+test_inputs = testing_data[:, 0:5]
+test_labels = testing_data[:, 5:]
 
-    # Train and test the network
-    train(net, training_inputs, training_labels, EPOCHS, LR, BATCH_SIZE)
-    avg_mse, predictions_online, predictions_offline = test(test_inputs, test_labels, net)
-    print(avg_mse)
+# Train and test the network
+train(net, training_inputs, training_labels, EPOCHS, LR, BATCH_SIZE)
+avg_mse, predictions_online, predictions_offline = test(test_inputs, test_labels, net)
+print(avg_mse)
 
 predictions_online_inverse_transform = scaler_test.inverse_transform(predictions_online)
 predictions_offline_inverse_transform = scaler_test.inverse_transform(predictions_offline)
@@ -119,8 +119,8 @@ online = pd.DataFrame(predictions_online_inverse_transform)
 offline = pd.DataFrame(predictions_offline_inverse_transform)
 avg_mse = pd.DataFrame([avg_mse, 0])
 
-online.to_excel('Data2/Optimised_Networks/manual_onlineT8 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data2/Optimised_Networks/manual_offlineT8 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data2/Optimised_Networks/manual_avg_mseT8 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+online.to_excel('Data2/Optimised_Networks/manual_onlineT10 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+offline.to_excel('Data2/Optimised_Networks/manual_offlineT10 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+avg_mse.to_excel('Data2/Optimised_Networks/manual_avg_mseT10 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
 
-torch.save(net.state_dict(), 'Data2/Optimised_Networks/Models/manualT8 {x}_{y}-{z}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+torch.save(net.state_dict(), 'Data2/Optimised_Networks/Models/manualT10 {x}_{y}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))

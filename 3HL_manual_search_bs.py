@@ -93,12 +93,12 @@ np.random.shuffle(training_data)
 
 # Manual Search Training Loop
 HL = 3
-HN1 = 10
-HN2 = 10
+HN1 = 6
+HN2 = 6
 HN3 = 6
-EPOCHS = 200
+EPOCHS = 500
 BATCH_SIZE = [5, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
-LR = 0.09
+LR = 0.2
 MODELS = {}
 
 net = Net(HN1, HN2, HN3)
@@ -115,7 +115,7 @@ for bs in BATCH_SIZE:
 
     MODELS['{a}_{x}-{y}-{d}_{z}_{b}_{c}'.format(a=HL, x=HN1, y=HN2, d=HN3, z=EPOCHS, b=LR, c=bs)] = avg_mse
 
-with open('Data2/Search/manual_search_results_{x}HL_bs.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/manual_search_results_{x}HL_bs444.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

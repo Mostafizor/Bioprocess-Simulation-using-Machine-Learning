@@ -93,7 +93,7 @@ np.random.shuffle(training_data)
 
 # Manual Search Training Loop
 HL = 3
-HN = [(5, 5, 3), (10, 10, 6), (15, 15, 9), (20, 20, 12)]
+HN = [(2, 2, 2), (4, 4, 4), (6, 6, 6), (8, 8, 8), (10, 10, 10)]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
 BATCH_SIZE = 50
 LR = 0.001

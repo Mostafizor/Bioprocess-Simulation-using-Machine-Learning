@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np 
+import copy
 from ann2 import Net
 from replicate import replicate_data
 from sklearn.preprocessing import StandardScaler
@@ -137,20 +138,22 @@ for subset in subset_train_list:
 
 # k-fold cross validation training loop
 HL = 2
-HN = [(5, 3), (10, 6), (15, 9), (20, 12)]
+HN = [(4, 4), (8, 8), (12, 12), (16, 16), (20, 20)]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
 BATCH_SIZE = 50
 LR = 0.001
 MODELS = {}
 
 for h1, h2 in HN:
+    net = Net(h1, h2)
+    init_state = copy.deepcopy(net.state_dict())
     for e in EPOCHS:
         MSEs = []
         for index, subset in enumerate(subset_train_list):
             subset.value = np.array(subset.value)
             subset_test_list[index].value = np.array(subset_test_list[index].value)
 
-            net = Net(h1, h2)
+            net.load_state_dict(init_state)
             training_inputs = subset.value[:, 0:5]
             training_labels = subset.value[:, 5:]
             test_inputs = subset_test_list[index].value[:, 0:5]

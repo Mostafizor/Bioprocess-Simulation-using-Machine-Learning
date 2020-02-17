@@ -135,20 +135,22 @@ for subset in subset_train_list:
 
 # k-fold cross validation training loop
 HL = 2
-HN1 = 20
+HN1 = 12
 HN2 = 12
 EPOCHS = 30
 BATCH_SIZE = [5, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
 LR = 0.0008
 MODELS = {}
 
+net = Net(HN1, HN2)
+init_state = copy.deepcopy(net.state_dict())
 for bs in BATCH_SIZE:
     MSEs = []
     for index, subset in enumerate(subset_train_list):
         subset.value = np.array(subset.value)
         subset_test_list[index].value = np.array(subset_test_list[index].value)
 
-        net = Net(HN1, HN2)
+        net.load_state_dict(init_state)
         training_inputs = subset.value[:, 0:5]
         training_labels = subset.value[:, 5:]
         test_inputs = subset_test_list[index].value[:, 0:5]
@@ -158,10 +160,10 @@ for bs in BATCH_SIZE:
         avg_mse = test(test_inputs, test_labels, net)
         MSEs.append(avg_mse)
 
-    avg_mse = sum(MSEs)/le  n(MSEs)
+    avg_mse = sum(MSEs)/len(MSEs)
     MODELS['{a}_{x}-{y}_{z}_{b}_{c}'.format(a=HL, x=HN1, y=HN2, z=EPOCHS, b=LR, c=bs)] = avg_mse
 
-with open('Data2/Search/k_fold_results_{x}HL_bs.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/k_fold_results_{x}HL_bs_up_to_20.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
