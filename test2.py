@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 def test(test_inputs, test_labels, net):
+    net.eval()
     test_X = torch.Tensor(test_inputs).view(-1, 5)
     test_y = torch.Tensor(test_labels)
 

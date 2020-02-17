@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np 
 from ann2 import Net
 from replicate import replicate_data
-from sklearn import preprocessing 
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import KFold
 from train import train
 from test import test
@@ -13,7 +13,8 @@ training_data = pd.read_excel('Data/reduced_training_data.xlsx')
 training_data_array = np.array(training_data)
 
 # Standardise Training Data
-training_data_array = preprocessing.scale(training_data_array)
+scaler_train = StandardScaler()
+scaler_train.fit(training_data)
 
 # Split data into k=6 folds.
 kf = KFold(n_splits=6)
@@ -50,19 +51,29 @@ for train_index, test_index in kf.split(training_data):
     
     index +=1
 
-# Replicate the training data in each subset.
+
+# Standardise Test Data
+for subset in subset_test_list:
+    subset.value = scaler_train.transform(subset.value)
+
+# Replicate and Standardise the training data in each subset.
+
 columns = "BC NC LP LI NIC".split()
 for index, subset in enumerate(subset_train_list):
     df = pd.DataFrame(data=subset.value, index=None, columns=columns)
     ref = df
+    df = scaler_train.transform(df)
 
     replicated_data1 = replicate_data(ref, 50, 0.03)
-    df = df.append(replicated_data1, ignore_index=True, sort=False)
+    replicated_data1 = scaler_train.transform(replicated_data1)
+    df = np.append(df, replicated_data1, axis=0) 
 
     replicated_data2 = replicate_data(ref, 50, 0.05)
-    df = df.append(replicated_data2, ignore_index=True, sort=False)
+    replicated_data2 = scaler_train.transform(replicated_data2)
+    df = np.append(df, replicated_data2, axis=0) 
 
-    subset.value = np.array(df)
+    subset.value = df
+
 
 # Calculate training and test labels
 for index1, subset in enumerate(subset_train_list):
@@ -152,7 +163,7 @@ for h1, h2 in HN:
         avg_mse = sum(MSEs)/len(MSEs)
         MODELS['{a}_{x}-{y}_{z}'.format(a=HL, x=h1, y=h2, z=e)] = avg_mse
 
-with open('Data/Search/k_fold_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/k_fold_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

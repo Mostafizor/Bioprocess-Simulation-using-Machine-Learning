@@ -3,7 +3,8 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 
-def train(net, inputs, labels, EPOCHS, l_rate, BATCH_SIZE):                                                                          
+def train(net, inputs, labels, EPOCHS, l_rate, BATCH_SIZE):
+	net.train()                                                                         
 	optimiser = optim.Adam(net.parameters(), lr = l_rate)									   # net.parameters(): all of the adjustable parameters in our network. lr: a hyperparameter adjusts the size of the step that the optimizer will take to minimise the loss.
 	loss_function = nn.MSELoss(reduction='mean')
 
