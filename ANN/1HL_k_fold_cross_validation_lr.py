@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np 
 import copy
-from ann2 import Net
+from ann1 import Net
 from replicate import replicate_data
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import KFold
@@ -52,11 +52,13 @@ for train_index, test_index in kf.split(training_data):
     
     index +=1
 
+
 # Standardise Test Data
 for subset in subset_test_list:
     subset.value = scaler_train.transform(subset.value)
 
-# Replicate the training data in each subset.
+# Replicate and Standardise the training data in each subset.
+
 columns = "BC NC LP LI NIC".split()
 for index, subset in enumerate(subset_train_list):
     df = pd.DataFrame(data=subset.value, index=None, columns=columns)
@@ -72,6 +74,7 @@ for index, subset in enumerate(subset_train_list):
     df = np.append(df, replicated_data2, axis=0) 
 
     subset.value = df
+
 
 # Calculate training and test labels
 for index1, subset in enumerate(subset_train_list):
@@ -134,17 +137,16 @@ for subset in subset_train_list:
     np.random.shuffle(subset.value)
 
 # k-fold cross validation training loop
-HL = 2
-HN1 = 12
-HN2 = 12
-EPOCHS = 30
-BATCH_SIZE = [5, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
-LR = 0.0008
+HL = 1
+HN1 = 10
+EPOCHS = 50
+BATCH_SIZE = 50
+LR = [0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 MODELS = {}
 
-net = Net(HN1, HN2)
+net = Net(HN1)
 init_state = copy.deepcopy(net.state_dict())
-for bs in BATCH_SIZE:
+for lr in LR:
     MSEs = []
     for index, subset in enumerate(subset_train_list):
         subset.value = np.array(subset.value)
@@ -156,14 +158,14 @@ for bs in BATCH_SIZE:
         test_inputs = subset_test_list[index].value[:, 0:5]
         test_labels = subset_test_list[index].value[:, 5:]
         
-        train(net, training_inputs, training_labels, EPOCHS, LR, bs)
+        train(net, training_inputs, training_labels, EPOCHS, lr, BATCH_SIZE)
         avg_mse = test(test_inputs, test_labels, net)
         MSEs.append(avg_mse)
 
     avg_mse = sum(MSEs)/len(MSEs)
-    MODELS['{a}_{x}-{y}_{z}_{b}_{c}'.format(a=HL, x=HN1, y=HN2, z=EPOCHS, b=LR, c=bs)] = avg_mse
+    MODELS['{a}_{x}_{z}_{b}'.format(a=HL, x=HN1, z=EPOCHS, b=lr)] = avg_mse
 
-with open('Data2/Search/k_fold_results_{x}HL_bs_up_to_20.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/k_fold_results_{x}HL_lr.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

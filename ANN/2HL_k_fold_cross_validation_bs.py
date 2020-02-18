@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np 
-from ann1 import Net
+import copy
+from ann2 import Net
 from replicate import replicate_data
-from sklearn import preprocessing 
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import KFold
 from train import train
 from test import test
@@ -13,7 +14,8 @@ training_data = pd.read_excel('Data/reduced_training_data.xlsx')
 training_data_array = np.array(training_data)
 
 # Standardise Training Data
-training_data_array = preprocessing.scale(training_data_array)
+scaler_train = StandardScaler()
+scaler_train.fit(training_data)
 
 # Split data into k=6 folds.
 kf = KFold(n_splits=6)
@@ -50,19 +52,26 @@ for train_index, test_index in kf.split(training_data):
     
     index +=1
 
+# Standardise Test Data
+for subset in subset_test_list:
+    subset.value = scaler_train.transform(subset.value)
+
 # Replicate the training data in each subset.
 columns = "BC NC LP LI NIC".split()
 for index, subset in enumerate(subset_train_list):
     df = pd.DataFrame(data=subset.value, index=None, columns=columns)
     ref = df
+    df = scaler_train.transform(df)
 
     replicated_data1 = replicate_data(ref, 50, 0.03)
-    df = df.append(replicated_data1, ignore_index=True, sort=False)
+    replicated_data1 = scaler_train.transform(replicated_data1)
+    df = np.append(df, replicated_data1, axis=0) 
 
     replicated_data2 = replicate_data(ref, 50, 0.05)
-    df = df.append(replicated_data2, ignore_index=True, sort=False)
+    replicated_data2 = scaler_train.transform(replicated_data2)
+    df = np.append(df, replicated_data2, axis=0) 
 
-    subset.value = np.array(df)
+    subset.value = df
 
 # Calculate training and test labels
 for index1, subset in enumerate(subset_train_list):
@@ -125,33 +134,36 @@ for subset in subset_train_list:
     np.random.shuffle(subset.value)
 
 # k-fold cross validation training loop
-HL = 1
-HN1 = 10
-EPOCHS = 50
-BATCH_SIZE = 50
-LR = [0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+HL = 2
+HN1 = 12
+HN2 = 12
+EPOCHS = 30
+BATCH_SIZE = [5, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
+LR = 0.0009
 MODELS = {}
 
-for lr in LR:
+net = Net(HN1, HN2)
+init_state = copy.deepcopy(net.state_dict())
+for bs in BATCH_SIZE:
     MSEs = []
     for index, subset in enumerate(subset_train_list):
         subset.value = np.array(subset.value)
         subset_test_list[index].value = np.array(subset_test_list[index].value)
 
-        net = Net(HN1)
+        net.load_state_dict(init_state)
         training_inputs = subset.value[:, 0:5]
         training_labels = subset.value[:, 5:]
         test_inputs = subset_test_list[index].value[:, 0:5]
         test_labels = subset_test_list[index].value[:, 5:]
         
-        train(net, training_inputs, training_labels, EPOCHS, lr, BATCH_SIZE)
+        train(net, training_inputs, training_labels, EPOCHS, LR, bs)
         avg_mse = test(test_inputs, test_labels, net)
         MSEs.append(avg_mse)
 
     avg_mse = sum(MSEs)/len(MSEs)
-    MODELS['{a}_{x}_{z}_{b}'.format(a=HL, x=HN1, z=EPOCHS, b=lr)] = avg_mse
+    MODELS['{a}_{x}-{y}_{z}_{b}_{c}'.format(a=HL, x=HN1, y=HN2, z=EPOCHS, b=LR, c=bs)] = avg_mse
 
-with open('Data/Search/k_fold_results_{x}HL_lr.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/k_fold_results_{x}HL_bs_up_to_20.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
