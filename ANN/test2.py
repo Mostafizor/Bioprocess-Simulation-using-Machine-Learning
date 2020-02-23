@@ -52,7 +52,7 @@ def test(test_inputs, test_labels, net):
     LP1, LP2 = test_inputs[0][2], test_inputs[12][2]
     for index, value in enumerate(test_inputs):
         if index < 12:
-            BC = BC1 + predictionNumpy[index][0]
+            BC = BC1 + predictionNumpy[index][0]    ### basically fix this so that it is net(BC1, NC1...)
             NC = NC1 + predictionNumpy[index][1]
             LP = LP1 + predictionNumpy[index][2]
             predictions_offline.append([BC, NC, LP, 1, 2])

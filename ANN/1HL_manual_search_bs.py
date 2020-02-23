@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np 
 import copy
-from ann1 import Net
+from rnn import RNN
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
@@ -96,24 +96,29 @@ HL = 1
 HN1 = 8
 EPOCHS = 50
 BATCH_SIZE = [5, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
-LR = 0.0007
+LR = 0.0005
 MODELS = {}
 
-net = Net(HN1)
-init_state = copy.deepcopy(net.state_dict())
+rnn = RNN(3, 5, 12, HN1, HL)
+init_state = copy.deepcopy(rnn.state_dict())
 for bs in BATCH_SIZE:
-    net.load_state_dict(init_state)
+    rnn.load_state_dict(init_state)
     training_inputs = training_data[:, 0:5]
     training_labels = training_data[:, 5:]
     test_inputs = testing_data[:, 0:5]
     test_labels = testing_data[:, 5:]
-    
-    train(net, training_inputs, training_labels, EPOCHS, LR, bs)
-    avg_mse = test(test_inputs, test_labels, net)
+
+    training_inputs = np.split(training_inputs, 606)
+    training_labels = np.split(training_labels, 606)
+    test_inputs = np.split(test_inputs, 2)
+    test_labels = np.split(test_labels, 2)
+
+    train(rnn, training_inputs, training_labels, EPOCHS, lr, BATCH_SIZE)
+    avg_mse = test(test_inputs, test_labels, rnn)
 
     MODELS['{a}_{x}_{z}_{b}_{c}'.format(a=HL, x=HN1, z=EPOCHS, b=LR, c=bs)] = avg_mse
 
-with open('Data2/Search/manual_search_results_{x}HL_bs.csv'.format(x=HL), 'w') as f:
+with open('Data/Search/manual_search_results_{x}HL_bs.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

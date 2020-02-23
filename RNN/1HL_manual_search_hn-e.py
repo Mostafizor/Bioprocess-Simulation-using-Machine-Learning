@@ -5,7 +5,7 @@ from rnn import RNN
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
-from test import test
+from test2 import test
 
 # Load training and testing data as pd dataframe
 training_data = pd.read_excel('Data/reduced_training_data.xlsx')
@@ -93,9 +93,9 @@ np.random.shuffle(training_data)
 
 # Manual Search Training Loop
 HL = 1
-HN = [4, 8, 12, 16, 20]
+HN = [5, 10, 15, 20]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
-BATCH_SIZE = 50
+BATCH_SIZE = 10
 LR = 0.001
 MODELS = {}
 
@@ -117,9 +117,9 @@ for h in HN:
             train(rnn, training_inputs, training_labels, e, LR, BATCH_SIZE)
             avg_mse = test(test_inputs, test_labels, rnn)
 
-            MODELS['{a}_{x}_{z}'.format(a=HL, x=h, z=e)] = avg_mse
+            MODELS['{a}_{x}_{z}'.format(a=HL, x=h, z=e)] = np.array(avg_mse)
 
-with open('Data/Search/manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
+with open('Data/Search/manual_search_results_{x}HL_hn-e_bs10.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

@@ -1,7 +1,7 @@
 import torch
 import pandas as pd
 import numpy as np 
-from rnn import RNN
+from rnn_test import RNN
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
@@ -89,14 +89,14 @@ for index, row in enumerate(testing_data):
         count = 0
 
 HL = 1
-HN1 = 5   
-EPOCHS = 50
+HN1 = 5
+EPOCHS = 10
 LR = 0.001
-BATCH_SIZE = 10
+BATCH_SIZE = 5
 rnn = RNN(3, 5, 12, HN1, HL)
 
 avg_mse=1
-while avg_mse > 0.00615:
+while avg_mse > 0.9:
     training_inputs = training_data[:, 0:5]
     training_labels = training_data[:, 5:]
     test_inputs = testing_data[:, 0:5]
@@ -109,7 +109,8 @@ while avg_mse > 0.00615:
 
 
     train(rnn, training_inputs, training_labels, EPOCHS, LR, BATCH_SIZE)
-    avg_mse, predictions_online, predictions_offline = test(test_inputs, test_labels, rnn)
+    avg_mse, predictions_online, predictions_offline = test(test_inputs, test_labels, rnn, BATCH_SIZE)
+print(avg_mse)
 
 predictions_online_inverse_transform = scaler_test.inverse_transform(predictions_online)
 predictions_offline_inverse_transform = scaler_test.inverse_transform(predictions_offline)
@@ -119,11 +120,11 @@ offline = pd.DataFrame(predictions_offline_inverse_transform)
 avg_mse = pd.DataFrame([avg_mse, 0])
 
 
-online.to_excel('Data/results/online4 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data/results/offline4 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data/results/avg_mse4 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+online.to_excel('Data/Optimised_Networks/online {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+offline.to_excel('Data/Optimised_Networks/offline {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+avg_mse.to_excel('Data/Optimised_Networks/avg_mse {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
 
-torch.save(rnn.state_dict(), 'Data/results/Models/ {x}_{y}_{a}_{b}_{c}4.pt'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+torch.save(rnn.state_dict(), 'Data/Optimised_Networks/Models/TTT {x}_{y}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
 
 
 
