@@ -3,17 +3,14 @@ import numpy as np
 import pandas as pd
 from torch.autograd import Variable
 
-#### NOTE: you know how net_out, test_inputs and test_labels look, Now redesign test function
-
 def test(test_inputs, test_labels, net):
     net.eval()
     test_X = Variable(torch.Tensor(test_inputs)) 
     test_y = Variable(torch.Tensor(test_labels))
 
-    predictionNumpy = []
+    hidden = net.init_hidden(test_X)
     with torch.no_grad():
-
-        net_out = net(test_X)
+        net_out, _ = net(test_X, hidden)  # Hidden state not required for manual feeding
 
     squared_error_X = []
     squared_error_N = []
