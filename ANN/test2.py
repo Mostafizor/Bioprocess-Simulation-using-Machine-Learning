@@ -38,13 +38,19 @@ def test(test_inputs, test_labels, net):
     MSE_list = [MSE_X1, MSE_N1, MSE_L1, MSE_X2, MSE_N2, MSE_L2]
     AVG_MSE = sum(MSE_list)/6
 
+    LI1, LI2 = test_inputs[0][3], test_inputs[12][3]
+    NIC1, NIC2 = test_inputs[0][4], test_inputs[12][4]
     predictions_online = []
     for index, value in enumerate(test_inputs):
         BC = value[0] + predictionNumpy[index][0]
         NC = value[1] + predictionNumpy[index][1]
         LP = value[2] + predictionNumpy[index][2]
 
-        predictions_online.append([BC, NC, LP, 1, 2])
+        if index < 12:
+            predictions_online.append([BC, NC, LP, LI1, NIC1])
+
+        if index >= 12:
+            predictions_online.append([BC, NC, LP, LI2, NIC2])
 
     predictions_offline = []
     BC1, BC2 = test_inputs[0][0], test_inputs[12][0]
@@ -52,21 +58,23 @@ def test(test_inputs, test_labels, net):
     LP1, LP2 = test_inputs[0][2], test_inputs[12][2]
     for index, value in enumerate(test_inputs):
         if index < 12:
-            BC = BC1 + predictionNumpy[index][0]    ### basically fix this so that it is net(BC1, NC1...)
-            NC = NC1 + predictionNumpy[index][1]
-            LP = LP1 + predictionNumpy[index][2]
-            predictions_offline.append([BC, NC, LP, 1, 2])
+            net_out = net(torch.Tensor([BC1, NC1, LP1, LI1, NIC1]))
+            BC = BC1 + net_out[0]   
+            NC = NC1 + net_out[1]
+            LP = LP1 + net_out[2]
+            predictions_offline.append([float(BC), float(NC), float(LP), float(LI1), float(NIC1)])
             BC1 = BC
             NC1 = NC
             LP1 = LP
         
         if index >= 12:
-            BC = BC2 + predictionNumpy[index][0]
-            NC = NC2 + predictionNumpy[index][1]
-            LP = LP2 + predictionNumpy[index][2]
-            predictions_offline.append([BC, NC, LP, 1, 2])
+            net_out = net(torch.Tensor([BC2, NC2, LP2, LI2, NIC2]))
+            BC = BC2 + net_out[0] 
+            NC = NC2 + net_out[1] 
+            LP = LP2 + net_out[2] 
+            predictions_offline.append([float(BC), float(NC), float(LP), float(LI2), float(NIC2)])
             BC2 = BC
             NC2 = NC
             LP2 = LP
-
+            
     return AVG_MSE, predictions_online, predictions_offline
