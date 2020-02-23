@@ -95,7 +95,7 @@ np.random.shuffle(training_data)
 HL = 1
 HN = [5, 10, 15, 20]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
-BATCH_SIZE = 10
+BATCH_SIZE = 5
 LR = 0.001
 MODELS = {}
 
@@ -119,7 +119,7 @@ for h in HN:
 
             MODELS['{a}_{x}_{z}'.format(a=HL, x=h, z=e)] = np.array(avg_mse)
 
-with open('Data/Search/manual_search_results_{x}HL_hn-e_bs10.csv'.format(x=HL), 'w') as f:
+with open('Data/Search/manual_search_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

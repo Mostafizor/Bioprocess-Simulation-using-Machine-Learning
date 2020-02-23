@@ -1,7 +1,7 @@
 import torch
 import pandas as pd
 import numpy as np 
-from rnn_test import RNN
+from rnn import RNN
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
@@ -89,8 +89,8 @@ for index, row in enumerate(testing_data):
         count = 0
 
 HL = 1
-HN1 = 5
-EPOCHS = 10
+HN1 = 4
+EPOCHS = 15
 LR = 0.001
 BATCH_SIZE = 5
 rnn = RNN(3, 5, 12, HN1, HL)
@@ -125,10 +125,3 @@ offline.to_excel('Data/Optimised_Networks/offline {x}_{y}_{a}_{b}_{c}.xlsx'.form
 avg_mse.to_excel('Data/Optimised_Networks/avg_mse {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
 
 torch.save(rnn.state_dict(), 'Data/Optimised_Networks/Models/TTT {x}_{y}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
-
-
-
-# Gather datasets into lists: so an array where each element is a list containing all 12 datapoints of a given dataset
-# Then batch them together
-# The convert to Variable
-# Then feed to network in batches
