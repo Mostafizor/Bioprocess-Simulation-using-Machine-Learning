@@ -5,7 +5,7 @@ from rnn import RNN
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
-from test import test
+from test_direct_prediction import test
 
 # Load training and testing data as pd dataframe
 training_data = pd.read_excel('Data/reduced_training_data.xlsx')
@@ -38,15 +38,15 @@ training_data = np.array(training_data)
 try:
     a = []
     for index, row in enumerate(training_data):
-        dBC = training_data[index + 1][0] - row[0]
-        dNC = training_data[index + 1][1] - row[1]
-        dLP = training_data[index + 1][2] - row[2]
+        BC = training_data[index + 1][0] 
+        NC = training_data[index + 1][1]
+        LP = training_data[index + 1][2]
         
-        rates = [dBC, dNC, dLP]
-        a.append(rates)
+        labels = [BC, NC, LP]
+        a.append(labels)
 except IndexError:
-    rates = [0, 0, 0]
-    a.append(rates)
+    labels = [0, 0, 0]
+    a.append(labels)
 
 a = np.array(a)
 training_data = np.append(training_data, a, axis=1)
@@ -54,15 +54,15 @@ training_data = np.append(training_data, a, axis=1)
 try:
     a = []
     for index, row in enumerate(testing_data):
-        dBC = testing_data[index + 1][0] - row[0]
-        dNC = testing_data[index + 1][1] - row[1]
-        dLP = testing_data[index + 1][2] - row[2]
+        BC = testing_data[index + 1][0]
+        NC = testing_data[index + 1][1]
+        LP = testing_data[index + 1][2]
         
-        rates = [dBC, dNC, dLP]
-        a.append(rates)
+        labels = [BC, NC, LP]
+        a.append(labels)
 except IndexError:
-    rates = [0, 0, 0]
-    a.append(rates)
+    labels = [0, 0, 0]
+    a.append(labels)
 
 a = np.array(a)
 testing_data = np.append(testing_data, a, axis=1)
@@ -90,7 +90,7 @@ for index, row in enumerate(testing_data):
 
 HL = 1
 HN1 = 15
-EPOCHS = 30
+EPOCHS = 15
 LR = 0.001
 BATCH_SIZE = 8
 
@@ -120,8 +120,8 @@ offline = pd.DataFrame(predictions_offline_inverse_transform)
 avg_mse = pd.DataFrame([avg_mse, 0])
 
 
-online.to_excel('Data/Optimised_Networks/k_fold_online11 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data/Optimised_Networks/k_fold_offline11 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data/Optimised_Networks/k_fold_avg_mse11 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+online.to_excel('Data/Optimised_Networks/online_direct_prediction {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+offline.to_excel('Data/Optimised_Networks/offline_direct_prediction {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+avg_mse.to_excel('Data/Optimised_Networks/avg_mse_direct_prediction {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
 
-torch.save(rnn.state_dict(), 'Data/Optimised_Networks/Models/k_fold11 {x}_{y}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))
+torch.save(rnn.state_dict(), 'Data/Optimised_Networks/Models/direct_prediction {x}_{y}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, a=EPOCHS, b=LR, c=BATCH_SIZE))

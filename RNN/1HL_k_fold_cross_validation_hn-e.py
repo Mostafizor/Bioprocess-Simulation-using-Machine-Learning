@@ -1,12 +1,12 @@
 import pandas as pd
 import numpy as np 
 import copy
-from ann1 import Net
+from rnn import RNN
 from replicate import replicate_data
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import KFold
 from train import train
-from test import test
+from test2 import test
 import csv
 
 # Load training data as pd dataframe and convert pd dataframe into numpy array.
@@ -138,35 +138,41 @@ for subset in subset_train_list:
 
 # k-fold cross validation training loop
 HL = 1
-HN = [4, 8, 12, 16, 20]
+HN = [5, 10, 15, 20]
 EPOCHS = [15, 30, 50, 100, 150, 200, 300, 400, 500, 600]
-BATCH_SIZE = 50
+BATCH_SIZE = 8
 LR = 0.001
 MODELS = {}
 
 for h1 in HN:
-    net = Net(h1)
-    init_state = copy.deepcopy(net.state_dict())
+    rnn = RNN(3, 5, 12, h1, HL)
+    init_state = copy.deepcopy(rnn.state_dict())
     for e in EPOCHS:
         MSEs = []
         for index, subset in enumerate(subset_train_list):
             subset.value = np.array(subset.value)
             subset_test_list[index].value = np.array(subset_test_list[index].value)
 
-            net.load_state_dict(init_state)
+            rnn.load_state_dict(init_state)
             training_inputs = subset.value[:, 0:5]
             training_labels = subset.value[:, 5:]
             test_inputs = subset_test_list[index].value[:, 0:5]
             test_labels = subset_test_list[index].value[:, 5:]
+
+            training_inputs = np.split(training_inputs, 505)
+            training_labels = np.split(training_labels, 505)
+
+            test_inputs = np.array([test_inputs])
+            test_labels = np.array([test_labels])
             
-            train(net, training_inputs, training_labels, e, LR, BATCH_SIZE)
-            avg_mse = test(test_inputs, test_labels, net)
+            train(rnn, training_inputs, training_labels, e, LR, BATCH_SIZE)
+            avg_mse = test(test_inputs, test_labels, rnn)
             MSEs.append(avg_mse)
 
         avg_mse = sum(MSEs)/len(MSEs)
         MODELS['{a}_{x}_{z}'.format(a=HL, x=h1, z=e)] = avg_mse
 
-with open('ANN/Data2/Search/k_fold_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
+with open('Data/Search/k_fold_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
