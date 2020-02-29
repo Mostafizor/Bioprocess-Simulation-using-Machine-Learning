@@ -1,11 +1,11 @@
-import torch
 import pandas as pd
 import numpy as np 
+import copy
 from rnn import RNN
 from replicate import replicate_data 
 from sklearn.preprocessing import StandardScaler
 from train import train
-from test import test
+from test2 import test
 
 # Load training and testing data as pd dataframe
 training_data = pd.read_excel('Data/reduced_training_data.xlsx')
@@ -88,15 +88,21 @@ for index, row in enumerate(testing_data):
         decrement += 1
         count = 0
 
+# Shuffle training data
+np.random.shuffle(training_data)
+
+# Manual Search Training Loop
 HL = 2
 HN = 15
 EPOCHS = 30
-LR = 0.0009
-BATCH_SIZE = 10
+BATCH_SIZE = 8
+LR = [0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+MODELS = {}
 
-avg_mse=1
-while avg_mse > 0.005:
-    rnn = RNN(3, 5, 12, HN, HL)
+rnn = RNN(3, 5, 12, HN, HL)
+init_state = copy.deepcopy(rnn.state_dict())
+for lr in LR:
+    rnn.load_state_dict(init_state)
     training_inputs = training_data[:, 0:5]
     training_labels = training_data[:, 5:]
     test_inputs = testing_data[:, 0:5]
@@ -107,21 +113,13 @@ while avg_mse > 0.005:
     test_inputs = np.split(test_inputs, 2)
     test_labels = np.split(test_labels, 2)
 
+    train(rnn, training_inputs, training_labels, EPOCHS, lr, BATCH_SIZE)
+    avg_mse = test(test_inputs, test_labels, rnn)
 
-    train(rnn, training_inputs, training_labels, EPOCHS, LR, BATCH_SIZE)
-    avg_mse, predictions_online, predictions_offline = test(test_inputs, test_labels, rnn, BATCH_SIZE)
-    print(avg_mse)
+    MODELS['{a}_{x}-{y}_{z}_{b}'.format(a=HL, x=HN, y=HN, z=EPOCHS, b=lr)] = np.array(avg_mse)
 
-predictions_online_inverse_transform = scaler_test.inverse_transform(predictions_online)
-predictions_offline_inverse_transform = scaler_test.inverse_transform(predictions_offline)
+with open('Data/Search/manual_search_results_{x}HL_lr.csv'.format(x=HL), 'w') as f:
+    for key in MODELS.keys():
+        f.write("%s: %s\n"%(key, MODELS[key]))
 
-online = pd.DataFrame(predictions_online_inverse_transform)
-offline = pd.DataFrame(predictions_offline_inverse_transform)
-avg_mse = pd.DataFrame([avg_mse, 0])
-
-
-online.to_excel('Data/Optimised_Networks/online {x}_{y}-{z}_{a}_{b}_{c} 5.xlsx'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data/Optimised_Networks/offline {x}_{y}-{z}_{a}_{b}_{c} 5.xlsx'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data/Optimised_Networks/avg_mse {x}_{y}-{z}_{a}_{b}_{c} 5.xlsx'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
-
-torch.save(rnn.state_dict(), 'Data/Optimised_Networks/Models/ {x}_{y}_{a}_{b}_{c} 5.pt'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
+print(MODELS)
