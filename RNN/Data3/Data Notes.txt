@@ -1,0 +1,6 @@
+Training data does not contain any examples of 300 light intensity: so use this as prrof that it can extrapolate
+Training data does not contain any examples of LI 150 & NIC 0.5 + LI 480 & NIC 0.1: use this as proof that it can extrapolate
+NIR 60: say no examples of this swtich in data thus it cant model this: need more experimental data representing this switch
+
+using only 4 datasets probably wont work well as there is no representation of LI 300 and only small representation of LI 150 & 480
+Lots of represenation of LI 600 which could cause overfitting.

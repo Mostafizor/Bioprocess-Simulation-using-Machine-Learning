@@ -8,8 +8,8 @@ from train import train
 from test import test
 
 # Load training and testing data as pd dataframe
-training_data = pd.read_excel('Data/reduced_training_data.xlsx')
-testing_data = pd.read_excel('Data/test_data.xlsx')
+training_data = pd.read_excel('Data2/reduced_training_data.xlsx')
+testing_data = pd.read_excel('Data2/test_data.xlsx')
 
 # Standardise training and testing data
 scaler_train = StandardScaler()
@@ -88,14 +88,14 @@ for index, row in enumerate(testing_data):
         decrement += 1
         count = 0
 
-HL = 2
+HL = 1
 HN = 15
-EPOCHS = 30
-LR = 0.0009
-BATCH_SIZE = 10
+EPOCHS = 15
+LR = 0.001
+BATCH_SIZE = 8
 
 avg_mse=1
-while avg_mse > 0.005:
+while avg_mse > 0.0035:
     rnn = RNN(3, 5, 12, HN, HL)
     training_inputs = training_data[:, 0:5]
     training_labels = training_data[:, 5:]
@@ -120,8 +120,8 @@ offline = pd.DataFrame(predictions_offline_inverse_transform)
 avg_mse = pd.DataFrame([avg_mse, 0])
 
 
-online.to_excel('Data/Optimised_Networks/online {x}_{y}-{z}_{a}_{b}_{c} 5.xlsx'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data/Optimised_Networks/offline {x}_{y}-{z}_{a}_{b}_{c} 5.xlsx'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data/Optimised_Networks/avg_mse {x}_{y}-{z}_{a}_{b}_{c} 5.xlsx'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
+online.to_excel('Data2/Optimised_Networks/online_k_fold4 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
+offline.to_excel('Data2/Optimised_Networks/offline_k_fold4 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
+avg_mse.to_excel('Data2/Optimised_Networks/avg_mse_k_fold4 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
 
-torch.save(rnn.state_dict(), 'Data/Optimised_Networks/Models/ {x}_{y}_{a}_{b}_{c} 5.pt'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
+torch.save(rnn.state_dict(), 'Data2/Optimised_Networks/Models/k_fold4 {x}_{y}_{a}_{b}_{c}.pt'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
