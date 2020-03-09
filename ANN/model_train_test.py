@@ -8,8 +8,8 @@ from train import train
 from test2 import test
 
 # Load training and testing data as pd dataframe
-training_data = pd.read_excel('Data/reduced_training_data.xlsx')
-testing_data = pd.read_excel('Data/test_data.xlsx')
+training_data = pd.read_excel('Data3/reduced_training_data.xlsx')
+testing_data = pd.read_excel('Data3/test_data.xlsx')
 
 # Standardise training and testing data
 scaler_train = StandardScaler()
@@ -93,10 +93,10 @@ np.random.shuffle(training_data)
 
 # Define structure of optimal network
 HL = 2
-HN1, HN2 = 16, 16
+HN1, HN2 = 10, 10
 EPOCHS = 50
-BATCH_SIZE = 20
-LR = 0.0004
+BATCH_SIZE = 200
+LR = 0.002
 
 # Instantiate the network and prepare data
 avg_mse=1
@@ -119,8 +119,8 @@ online = pd.DataFrame(predictions_online_inverse_transform)
 offline = pd.DataFrame(predictions_offline_inverse_transform)
 avg_mse = pd.DataFrame([avg_mse, 0])
 
-online.to_excel('Data2/Optimised_Networks/manual_online4 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data2/Optimised_Networks/manual_offline4 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data2/Optimised_Networks/manual_avg_mse4 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+online.to_excel('Data3/Optimised_Networks/kfold_online4 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+offline.to_excel('Data3/Optimised_Networks/kfold_offline4 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+avg_mse.to_excel('Data3/Optimised_Networks/kfold_avg_mse4 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
 
-torch.save(net.state_dict(), 'Data2/Optimised_Networks/Models/manual4 {x}_{y}-{z}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+torch.save(net.state_dict(), 'Data3/Optimised_Networks/Models/kfold4 {x}_{y}-{z}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))

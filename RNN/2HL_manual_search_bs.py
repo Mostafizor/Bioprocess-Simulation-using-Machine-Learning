@@ -8,8 +8,8 @@ from train import train
 from test2 import test
 
 # Load training and testing data as pd dataframe
-training_data = pd.read_excel('Data/reduced_training_data.xlsx')
-testing_data = pd.read_excel('Data/test_data.xlsx')
+training_data = pd.read_excel('Data2/reduced_training_data.xlsx')
+testing_data = pd.read_excel('Data2/test_data.xlsx')
 
 # Standardise training and testing data
 scaler_train = StandardScaler()
@@ -93,10 +93,10 @@ np.random.shuffle(training_data)
 
 # Manual Search Training Loop
 HL = 2
-HN = 15
-EPOCHS = 30
+HN = 10
+EPOCHS = 15
 BATCH_SIZE = [3, 5, 8, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
-LR = 0.0009
+LR = 0.004
 MODELS = {}
 
 rnn = RNN(3, 5, 12, HN, HL)
@@ -118,7 +118,7 @@ for bs in BATCH_SIZE:
 
     MODELS['{a}_{x}-{y}_{z}_{b}_{c}'.format(a=HL, x=HN, y=HN, z=EPOCHS, b=LR, c=bs)] = avg_mse
 
-with open('Data/Search/manual_search_results_{x}HL_bs.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/manual_search_results_{x}HL_bs.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

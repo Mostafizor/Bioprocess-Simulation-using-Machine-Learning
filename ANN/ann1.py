@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+torch.manual_seed(777)
+
 class Net(nn.Module):
 	'''
 	This Class Defines the Structure of the Artificial Neural Network

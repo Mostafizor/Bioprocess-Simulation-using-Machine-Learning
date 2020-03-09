@@ -88,14 +88,14 @@ for index, row in enumerate(testing_data):
         decrement += 1
         count = 0
 
-HL = 1
-HN = 15
+HL = 2
+HN = 10
 EPOCHS = 15
-LR = 0.001
+LR = 0.004
 BATCH_SIZE = 8
 
 avg_mse=1
-while avg_mse > 0.0035:
+while avg_mse > 0.004:
     rnn = RNN(3, 5, 12, HN, HL)
     training_inputs = training_data[:, 0:5]
     training_labels = training_data[:, 5:]
@@ -120,8 +120,8 @@ offline = pd.DataFrame(predictions_offline_inverse_transform)
 avg_mse = pd.DataFrame([avg_mse, 0])
 
 
-online.to_excel('Data2/Optimised_Networks/online_k_fold4 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data2/Optimised_Networks/offline_k_fold4 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data2/Optimised_Networks/avg_mse_k_fold4 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
+online.to_excel('Data2/Optimised_Networks/online_kfold6 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
+offline.to_excel('Data2/Optimised_Networks/offline_kfold6 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
+avg_mse.to_excel('Data2/Optimised_Networks/avg_mse_kfold6 {x}_{y}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
 
-torch.save(rnn.state_dict(), 'Data2/Optimised_Networks/Models/k_fold4 {x}_{y}_{a}_{b}_{c}.pt'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))
+torch.save(rnn.state_dict(), 'Data2/Optimised_Networks/Models/kfold6 {x}_{y}_{a}_{b}_{c}.pt'.format(x=HL, y=HN, z=HN, a=EPOCHS, b=LR, c=BATCH_SIZE))

@@ -10,7 +10,7 @@ from test import test
 import csv
 
 # Load training data as pd dataframe and convert pd dataframe into numpy array.
-training_data = pd.read_excel('Data/reduced_training_data.xlsx')
+training_data = pd.read_excel('Data3/reduced_training_data.xlsx')
 training_data_array = np.array(training_data)
 
 # Standardise Training Data
@@ -135,11 +135,11 @@ for subset in subset_train_list:
 
 # k-fold cross validation training loop
 HL = 2
-HN1 = 12
-HN2 = 12
-EPOCHS = 30
+HN1 = 10
+HN2 = 10
+EPOCHS = 50
 BATCH_SIZE = [5, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
-LR = 0.0009
+LR = 0.002
 MODELS = {}
 
 net = Net(HN1, HN2)
@@ -163,7 +163,7 @@ for bs in BATCH_SIZE:
     avg_mse = sum(MSEs)/len(MSEs)
     MODELS['{a}_{x}-{y}_{z}_{b}_{c}'.format(a=HL, x=HN1, y=HN2, z=EPOCHS, b=LR, c=bs)] = avg_mse
 
-with open('Data2/Search/k_fold_results_{x}HL_bs_up_to_20.csv'.format(x=HL), 'w') as f:
+with open('Data3/Search/k_fold_results_{x}HL.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
