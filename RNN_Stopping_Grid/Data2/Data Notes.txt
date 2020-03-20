@@ -1,0 +1,12 @@
+Data lying outside trainset: LI 480 & NIC 0.5 + LI 300 & NIC 0.1: proves extrapolation cabapility.
+Furthermore, LI 300 in trainset has NIR of 60, whereas LI 300 in testset has LIR of only 3: proves extrapolation capaability. 
+if nitrate graph for LI 300 could be better say this: the graph is the worst simulation as there is no representration for LI 300 with NIR of 3..
+
+
+This should work well as we are representing all lI & NIC. We are also representing the NIR switch to 60.
+PReviously, NIR 60 switch was in test set but it was not represented at all in the train set, this probably explains why the simulation of the NC in that test was so bad.
+Furthermore, the biggest issue with the previous nitrate graph was that at 60h, the nitrate concentration is very small ~140 which is hard for the network to simulate without going into the negative territory.
+Now, for both test sets, the nitrate concentration does not drop to such low values. 
+
+It may be the case that LI 300 & NIC 0.1 is simulated badly as the network is assuming for an LI of 300 that the NIR is 60 when infact it is 3 for LI 300 & NIC 0.1.
+In this case, use both LI 300 in train set and remove one of LI 600 from train set (the one that balances out number of NIC examples)
