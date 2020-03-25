@@ -93,10 +93,10 @@ np.random.shuffle(training_data)
 
 # Manual Search Training Loop
 HL = 1
-HN1 = 20
-EPOCHS = 54
+HN1 = 18
+EPOCHS = 11
 BATCH_SIZE = [3, 5, 8, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
-LR = 0.0005
+LR = 0.06
 MODELS = {}
 
 rnn = RNN(3, 5, 12, HN1, HL)
