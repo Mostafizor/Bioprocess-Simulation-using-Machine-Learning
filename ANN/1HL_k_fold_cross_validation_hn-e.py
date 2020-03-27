@@ -171,38 +171,3 @@ with open('Data2/Search/k_fold_results_{x}HL_hn-e.csv'.format(x=HL), 'w') as f:
         f.write("%s: %s\n"%(key, MODELS[key]))
 
 print(MODELS)
-
-# Should the test set be standardised as part of the training data?
-# Or should all of the test data in the folds be standardised together - excluding the train data?
-# Or can I standardise before splitting into folds and replication?
-# Ask Gabe what he did for manual search standardisation
-# Right now i will standardise at the outset
-# In manual search i standardised after replication
-# worst case: test both
-# If i standardise at the outset, I have to add the rates of change to the standardised inputs and subsequently unstandaridse the output. 
-
-# Split Training Data into Inputs and labels
-
-
-# training_inputs = training_data_array[:, 0:5]
-# training_labels = training_data_array[:, 5:]
-# print(training_inputs)
-# print(training_labels)
-
-# standardised_inputs = preprocessing.scale(training_inputs)
-# standardised_labels = preprocessing.scale(training_labels)
-
-# print(standardised_inputs)
-# print(standardised_labels)
-
-# load traindata - decide on traindata based on advice from articles **
-# convert pd dataframe to numpy array **
-# Standardise Training Data **
-# split data into k folds (k=6) **
-# For each subset of data , replicate the training data (k-1)**
-# Then calculate labels**
-# Then remove 144 h input points**
-# The convert subset_train_list and subset_test_list into numpy arrays**
-# Shuffle data**
-# standardise training data
-# Implement training loop (5-3 neurons)
