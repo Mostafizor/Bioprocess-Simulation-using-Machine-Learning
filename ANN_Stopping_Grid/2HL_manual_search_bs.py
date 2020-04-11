@@ -97,7 +97,7 @@ HN1 = 4
 HN2 = 8
 EPOCHS = 152
 BATCH_SIZE = [5, 10, 15, 20, 30, 40, 50, 100, 200, 300, 400, 500]
-LR = 0.2
+LR = 0.006
 MODELS = {}
 
 net = Net(HN1, HN2)

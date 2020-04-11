@@ -95,12 +95,12 @@ np.random.shuffle(training_data)
 HL = 2
 HN1, HN2 = 4, 8
 EPOCHS = 152
-BATCH_SIZE = 40
-LR = 0.2
+BATCH_SIZE = 300
+LR = 0.006
 
 # Instantiate the network and prepare data
 avg_mse=1
-while avg_mse > 0.006:
+while avg_mse > 0.0045:
     net = Net(HN1, HN2)
     training_inputs = training_data[:, 0:5]
     training_labels = training_data[:, 5:]
@@ -119,8 +119,8 @@ online = pd.DataFrame(predictions_online_inverse_transform)
 offline = pd.DataFrame(predictions_offline_inverse_transform)
 avg_mse = pd.DataFrame([avg_mse, 0])
 
-online.to_excel('Data3/Optimised_Networks/manual_online {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
-offline.to_excel('Data3/Optimised_Networks/manual_offline {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
-avg_mse.to_excel('Data3/Optimised_Networks/manual_avg_mse {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+online.to_excel('Data3/Optimised_Networks/manual_online7 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+offline.to_excel('Data3/Optimised_Networks/manual_offline7 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+avg_mse.to_excel('Data3/Optimised_Networks/manual_avg_mse7 {x}_{y}-{z}_{a}_{b}_{c}.xlsx'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
 
-torch.save(net.state_dict(), 'Data3/Optimised_Networks/Models/manual {x}_{y}-{z}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))
+torch.save(net.state_dict(), 'Data3/Optimised_Networks/Models/manual7 {x}_{y}-{z}_{a}_{b}_{c}.pt'.format(x=HL, y=HN1, z=HN2, a=EPOCHS, b=LR, c=BATCH_SIZE))

@@ -13,7 +13,7 @@ def train(net, training_inputs, training_labels, test_inputs, test_labels, EPOCH
 	y = torch.Tensor(training_labels)
 
 	E_va_list = []
-	GL_MAX = 1
+	GL_MAX = 2
 	for epoch in range(EPOCHS):
 		for i in tqdm(range(0, len(X), BATCH_SIZE)):
 			batch_X = X[i:i+BATCH_SIZE].view(-1, 5)
