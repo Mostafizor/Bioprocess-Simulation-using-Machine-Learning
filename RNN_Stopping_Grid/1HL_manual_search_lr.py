@@ -88,13 +88,11 @@ for index, row in enumerate(testing_data):
         decrement += 1
         count = 0
 
-# Shuffle training data
-np.random.shuffle(training_data)
 
 # Manual Search Training Loop
 HL = 1
-HN1 = 18
-EPOCHS = 11
+HN1 = 15
+EPOCHS = 30
 BATCH_SIZE = 8
 LR = [0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 MODELS = {}
@@ -118,7 +116,7 @@ for lr in LR:
 
     MODELS['{a}_{x}_{z}_{b}'.format(a=HL, x=HN1, z=EPOCHS, b=lr)] = np.array(avg_mse)
 
-with open('Data2/Search/manual_search_results_{x}HL_lr.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/manual_search_results_{x}HL_lr_GLMAX1_1_15_30.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

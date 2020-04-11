@@ -87,11 +87,12 @@ for index, row in enumerate(testing_data):
         testing_data = np.delete(testing_data, delete, 0)
         decrement += 1
         count = 0
+        
 
 # Manual Search Training Loop
 HL = 1
-HN = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-EPOCHS = 3000
+HN = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+EPOCHS = 500
 BATCH_SIZE = 8
 LR = 0.001
 MODELS = {}
@@ -114,7 +115,7 @@ for h in HN:
     E_opt, opt_epochs = train(rnn, training_inputs, training_labels, test_inputs, test_labels, EPOCHS, LR, BATCH_SIZE)
     MODELS['{b}_{x}_{z}'.format(b=HL, x=h, z=opt_epochs)] = E_opt
 
-with open('Data2/Search/manual_search_results_{x}HL_hn-e_fixedshuffle.csv'.format(x=HL), 'w') as f:
+with open('Data2/Search/manual_search_results_{x}HL_hn-e_GLMAX3_extended_range.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
