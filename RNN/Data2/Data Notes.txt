@@ -1,4 +1,4 @@
-Data lying outside trainset: LI 480 & NIC 0.5 + LI 300 & NIC 0.1: proves extrapolation cabapility.
+Data lying outside trainset: LI 480 & NIC 0.5 + LI 300 & NIC 0.1: proves interpolation cabapility.
 Furthermore, LI 300 in trainset has NIR of 60, whereas LI 300 in testset has LIR of only 3: proves extrapolation capaability. 
 if nitrate graph for LI 300 could be better say this: the graph is the worst simulation as there is no representration for LI 300 with NIR of 3..
 

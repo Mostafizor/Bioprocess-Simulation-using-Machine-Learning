@@ -76,7 +76,7 @@ for index, row in enumerate(training_data):
         delete = index - decrement
         training_data = np.delete(training_data, delete, 0)
         decrement += 1
-        count = 0
+        count = 0   
 
 count = 0
 decrement = 0
