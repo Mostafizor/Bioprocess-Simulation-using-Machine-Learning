@@ -90,7 +90,7 @@ for index, row in enumerate(testing_data):
 
 
 # Manual Search Training Loop
-HL = 1
+HL = 2
 HN1 = 15
 EPOCHS = 30
 BATCH_SIZE = 8

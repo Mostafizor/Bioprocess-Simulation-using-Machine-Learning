@@ -118,7 +118,7 @@ for h1, h2 in HN:
     E_opt, opt_epochs = train(net, training_inputs, training_labels, test_inputs, test_labels, EPOCHS, LR, BATCH_SIZE)
     MODELS['{b}_{x}-{y}_{z}'.format(b=HL, x=h1, y=h2, z=opt_epochs)] = E_opt
 
-with open('Data3/Search/manual_search_results_{x}HL_hn-e_GLMAX2.csv'.format(x=HL), 'w') as f:
+with open('Data3/Search/manual_search_results_{x}TIMETEST.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 

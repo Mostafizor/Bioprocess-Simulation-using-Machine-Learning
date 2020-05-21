@@ -20,5 +20,6 @@ def train(net, inputs, labels, EPOCHS, l_rate, BATCH_SIZE):
             optimiser.zero_grad()
             outputs, _ = net(batch_X, hidden)
             loss = loss_function(outputs, batch_y)
+            print(loss)
             loss.backward()
             optimiser.step()

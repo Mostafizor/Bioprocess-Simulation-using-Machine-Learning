@@ -113,7 +113,7 @@ for lr in LR:
 
     MODELS['{a}_{x}-{y}_{z}_{b}'.format(a=HL, x=HN1, y=HN2, z=EPOCHS, b=lr)] = avg_mse
 
-with open('Data3/Search/manual_search_results_{x}HL_lr.csv'.format(x=HL), 'w') as f:
+with open('Data3/Search/manual_search_results_{x}HL_lrTIMETEST.csv'.format(x=HL), 'w') as f:
     for key in MODELS.keys():
         f.write("%s: %s\n"%(key, MODELS[key]))
 
